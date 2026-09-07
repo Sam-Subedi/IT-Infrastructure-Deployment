@@ -59,15 +59,15 @@ Invoke-Command -ComputerName $DCs -ScriptBlock {
 Move-ADDirectoryServerOperationMasterRole -Identity DTDC03 -OperationMasterRole 0,1,2,3,4
 
 # Check DNS client server addresses on a specific DC
-Invoke-Command -ComputerName dtdc01 `
-    -ScriptBlock {Get-DnsClientServerAddress | `
+Invoke-Command -ComputerName dtdc01 
+    -ScriptBlock {Get-DnsClientServerAddress | 
         Select-Object elementname,serveraddresses}
 
 # Set DNS client server addresses on a specific DC and clear DNS cache
 Invoke-Command -ComputerName dtdc02 `
-    -ScriptBlock {Set-DnsClientServerAddress -InterfaceAlias "Ethernet" `
-        -ServerAddresses ("10.12.25.15","10.12.25.12","10.12.25.13") ; `
-        Get-DnsClientServerAddress | Select-Object elementname,serveraddresses ; ` 
+    -ScriptBlock {Set-DnsClientServerAddress -InterfaceAlias "Ethernet" 
+        -ServerAddresses ("10.12.25.15","10.12.25.12","10.12.25.13") ; 
+        Get-DnsClientServerAddress | Select-Object elementname,serveraddresses ; 
         Clear-DnsClientCache}
 
 # Install AD DS role on a new server
@@ -77,13 +77,13 @@ Add-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManage
 $credential = Get-Credential "professa.ea@$theDomain"
 
 # Promote the server to a domain controller in an existing domain
-Install-ADDSDomainController `
-    -DomainName $theDomain `
-    -InstallDns:$true `
-    -ReplicationSourceDC $pdc `
-    -DatabasePath "C:\Windows\NTDS" `
-    -LogPath "C:\Windows\NTDS" `
-    -SysvolPath "C:\Windows\SYSVOL" `
+Install-ADDSDomainController 
+    -DomainName $theDomain 
+    -InstallDns:$true 
+    -ReplicationSourceDC $pdc 
+    -DatabasePath "C:\Windows\NTDS" 
+    -LogPath "C:\Windows\NTDS" 
+    -SysvolPath "C:\Windows\SYSVOL" 
     -Credential $credential
 
 # Post-promotion quick checks
@@ -142,7 +142,7 @@ Set-ADForestMode -Identity $dtForest -ForestMode $dtForestMode
 # Check the AD database page size on all DCs
 $objClass="(ObjectClass=nTDSDSA)"
 $adsiDomConf="CN=Configuration,DC=dariens,DC=tips"
-Get-ADObject -LDAPFilter $objClass -SearchBase $adsiDomConf -properties msDS-JetDBPageSize `
+Get-ADObject -LDAPFilter $objClass -SearchBase $adsiDomConf -properties msDS-JetDBPageSize 
     | Format-List distinguishedName,msDs-JetDBPageSize
 
 # Enable the 32k page size feature in the domain
