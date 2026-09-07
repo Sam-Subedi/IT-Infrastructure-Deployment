@@ -49,3 +49,57 @@ repadmin /showrepl → Show me the detailed replication relationships/errors
 net share → What shares exist?
 SYSVOL → Is the SYSVOL share present?
 NETLOGON → Is the NETLOGON share present?
+
+dcdiag: Runs a general Domain Controller diagnostic. It checks the overall health of the Domain Controller, including Active Directory, DNS, replication, services, 
+connectivity, and other important DC functions. In a real-world environment, it is commonly used as the first command when troubleshooting Domain Controller health issues. 
+For example, if users suddenly cannot log in or Group Policy is not applying, an administrator can run dcdiag to look for common Domain Controller problems.
+
+dcdiag /v: Runs the Domain Controller diagnostic in verbose mode and provides much more detailed information than the standard dcdiag command. It displays additional test
+results, configuration details, errors, warnings, and information about individual tests. In a real-world environment, this is useful when the basic dcdiag output shows a
+problem and more information is required to identify the root cause. For example, if dcdiag reports that a test has failed but does not provide enough information to 
+understand why, dcdiag /v can provide additional details that help the administrator investigate the issue.
+
+dcdiag /test:dns: Performs specific DNS-related health checks on the Domain Controller. It verifies DNS configuration, DNS registration, connectivity to DNS servers, and 
+important Active Directory DNS records. DNS is very important to Active Directory because Domain Controllers use DNS to locate other Domain Controllers and services. In a 
+real-world environment, DNS problems can cause users to have login problems, prevent computers from locating a Domain Controller, and cause Active Directory replication
+problems. For example, if a workstation cannot find a Domain Controller when a user tries to log in, an administrator can run dcdiag /test:dns to check whether DNS is 
+correctly configured.
+
+dcdiag /test:replications: Performs a specific test of Active Directory replication health. It checks whether replication between Domain Controllers is functioning correctly
+and identifies replication-related failures or errors. Active Directory information must replicate between Domain Controllers so that changes made on one Domain Controller 
+are available on the others. In a real-world environment, replication problems can result in different Domain Controllers having different user accounts, passwords, 
+Group Policy information, or other Active Directory data. For example, if a new user is created on one Domain Controller but cannot be found when another Domain Controller 
+is checked, replication should be investigated.
+
+repadmin /replsummary: Provides a summary of Active Directory replication health across the Domain Controllers in the environment. It shows replication failures, error counts
+, and information about Domain Controllers experiencing replication problems. In a real-world environment, this command provides a quick way to identify which Domain Controllers 
+may have replication issues without reviewing every individual replication connection. For example, in an environment with several Domain Controllers, an administrator can run 
+repadmin /replsummary to quickly see whether replication is healthy across the domain and identify any Domain Controllers reporting failures.
+
+repadmin /showrepl: Displays detailed inbound Active Directory replication information for a Domain Controller. It shows the replication partners, naming contexts being 
+replicated, the last successful replication, and any replication errors. In a real-world environment, this command is useful for investigating exactly which Domain Controller
+or replication connection is failing. For example, if repadmin /replsummary reports a replication error, an administrator can use repadmin /showrepl to determine which 
+replication partner is failing and when the last successful replication occurred.
+
+net share: Displays all shared folders and resources currently being shared by the server. In a real-world Domain Controller environment, this provides a quick way to confirm
+that important domain-related shares, such as SYSVOL and NETLOGON, are available. These shares are important for normal domain operations because clients need access to
+certain domain resources during authentication and Group Policy processing. For example, an administrator can run net share after a Domain Controller restart to confirm that
+the expected SYSVOL and NETLOGON shares are present.
+
+net share SYSVOL: Checks whether the SYSVOL share exists and is available on the Domain Controller. The presence of SYSVOL confirms that the share is being provided by the 
+server, but it does not by itself prove that SYSVOL replication is healthy. SYSVOL contains important domain files, including Group Policy Objects (GPOs), Group Policy 
+templates, startup and shutdown scripts, and other policy-related files. In modern Active Directory environments, SYSVOL replication is normally handled by DFSR, while 
+older environments may use the legacy NTFRS technology. These files must be replicated and available across Domain Controllers so users and computers receive the correct 
+policies regardless of which Domain Controller they use. In a real-world environment, a missing SYSVOL share can cause Group Policy processing and other domain functions
+to fail. For example, if users are not receiving a new Group Policy setting, an administrator can check whether the SYSVOL share exists and then use appropriate DFSR and 
+Active Directory replication checks to investigate further.
+
+net share NETLOGON: Checks whether the NETLOGON share exists and is available on the Domain Controller. NETLOGON is an important share provided by Domain Controllers and is 
+associated with domain authentication and logon operations. It maps to the SYSVOL\domain\scripts folder and can host legacy logon scripts that are used when users log on to the 
+domain. The presence of the NETLOGON share is a useful indicator that the Domain Controller is providing this expected domain service, but it does not by itself prove that 
+the entire Active Directory Domain Services (AD DS) role is healthy or that the server is fully functional as a Domain Controller. Other commands, such as dcdiag and repadmin,
+should be used to verify overall Domain Controller health and replication. In a real-world environment, a missing NETLOGON share can indicate a problem with the Domain Controller 
+or related services. For example, if a user's logon script is not running or a recently promoted Domain Controller does not have the NETLOGON share, an administrator can check 
+the share and then investigate the underlying AD DS, SYSVOL, or replication issue.
+
+
